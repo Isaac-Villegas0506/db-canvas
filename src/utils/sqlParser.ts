@@ -6,7 +6,7 @@ interface ParsedSchema {
     relations: Relation[];
 }
 
-export const parseSQL = (sql: string, currentDatabase: DatabaseEngine = 'MySQL'): ParsedSchema => {
+export const parseSQL = (sql: string, _currentDatabase: DatabaseEngine = 'MySQL'): ParsedSchema => {
     const tables: Table[] = [];
     const relations: Relation[] = [];
 
@@ -18,7 +18,7 @@ export const parseSQL = (sql: string, currentDatabase: DatabaseEngine = 'MySQL')
     const createTableRegex = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:`?(\w+)`?)(?:\s*\(([\s\S]*?)\))(?:\s*ENGINE\s*=\s*\w+)?(?:\s*DEFAULT\s*CHARSET\s*=\s*\w+)?;?/gim;
 
     let match;
-    let tableIndex = 0;
+    // let tableIndex = 0; // Unused
 
     const tableNameToId: Record<string, string> = {};
     const tempTables: { name: string; body: string; id: string }[] = [];
@@ -33,7 +33,7 @@ export const parseSQL = (sql: string, currentDatabase: DatabaseEngine = 'MySQL')
 
     tempTables.forEach((tempTable, index) => {
         const columns: Column[] = [];
-        const lines = tempTable.body.split(',').map(l => l.trim()).filter(l => l);
+        // const lines = tempTable.body.split(',').map(l => l.trim()).filter(l => l);
 
         const processedLines: string[] = [];
         let currentLine = '';
@@ -79,9 +79,10 @@ export const parseSQL = (sql: string, currentDatabase: DatabaseEngine = 'MySQL')
                 if (fkMatch) {
                     const sourceColName = fkMatch[1];
                     const targetTableName = fkMatch[2];
-                    const targetColName = fkMatch[3];
-                    const onDelete = fkMatch[4] as any || 'CASCADE';
-                    const onUpdate = fkMatch[5] as any || 'CASCADE';
+                    // Unused in this pass
+                    // const targetColName = fkMatch[3];
+                    // const onDelete = fkMatch[4] as any || 'CASCADE';
+                    // const onUpdate = fkMatch[5] as any || 'CASCADE';
 
                     const sourceCol = columns.find(c => c.name === sourceColName);
                     if (sourceCol) {
@@ -99,7 +100,7 @@ export const parseSQL = (sql: string, currentDatabase: DatabaseEngine = 'MySQL')
             if (colMatch) {
                 const name = colMatch[1];
                 const rawType = colMatch[2].toUpperCase();
-                const args = colMatch[3];
+                // const args = colMatch[3]; // Unused
                 const rest = colMatch[4].toUpperCase();
 
                 let type: DataType = 'VARCHAR';
@@ -145,8 +146,6 @@ export const parseSQL = (sql: string, currentDatabase: DatabaseEngine = 'MySQL')
         const sourceTableId = tempTable.id;
         const sourceTable = tables.find(t => t.id === sourceTableId);
         if (!sourceTable) return;
-
-        const lines = tempTable.body.split(',').map(l => l.trim()).filter(l => l);
 
         const fkRegex = /(?:CONSTRAINT\s+`?\w+`?\s+)?FOREIGN\s+KEY\s*\(`?(\w+)`?\)\s+REFERENCES\s+`?(\w+)`?\s*\(`?(\w+)`?\)(?:\s+ON\s+DELETE\s+(CASCADE|SET NULL|NO ACTION|RESTRICT))?(?:\s+ON\s+UPDATE\s+(CASCADE|SET NULL|NO ACTION|RESTRICT))?/gim;
 
