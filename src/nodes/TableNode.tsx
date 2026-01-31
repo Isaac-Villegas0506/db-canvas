@@ -50,9 +50,9 @@ export const TableNode: React.FC<TableNodeProps> = ({
     };
 
     const getColumnIcon = (col: typeof table.columns[0]) => {
-        if (col.isPrimaryKey) return '🔑';
-        if (col.isForeignKey) return '🔗';
-        if (col.isUnique) return '◆';
+        if (col.isPrimaryKey) return 'PK';
+        if (col.isForeignKey) return 'FK';
+        if (col.isUnique) return 'UQ';
         return null;
     };
 
@@ -143,7 +143,7 @@ export const TableNode: React.FC<TableNodeProps> = ({
                     strokeWidth={1}
                 />
                 <Text
-                    text="☰"
+                    text=""
                     x={10}
                     y={10}
                     fontSize={14}
@@ -206,10 +206,11 @@ export const TableNode: React.FC<TableNodeProps> = ({
                     cornerRadius={4}
                 />
                 <Text
-                    text="✎"
-                    x={5}
-                    y={3}
-                    fontSize={12}
+                    text="..."
+                    x={4}
+                    y={1}
+                    fontSize={14}
+                    fontStyle="bold"
                     fill="white"
                     listening={false}
                 />

@@ -4,12 +4,13 @@ export default {
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
     ],
+    darkMode: 'class',
     theme: {
         extend: {
             colors: {
                 canvas: {
-                    bg: '#f8f9fa',
-                    grid: '#e9ecef',
+                    bg: 'var(--canvas-bg)',
+                    grid: 'var(--canvas-grid)',
                 }
             }
         },

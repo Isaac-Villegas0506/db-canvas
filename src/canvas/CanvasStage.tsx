@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
+import { Link as LinkIcon, Book, BookOpen, Repeat } from 'lucide-react';
 import { Stage, Layer, Arrow, Line, Group, Text, Rect } from 'react-konva';
 import { useSchemaStore } from '../store/useSchemaStore';
 import { useUIStore } from '../store/uiStore';
@@ -167,8 +168,10 @@ export const CanvasStage: React.FC = () => {
         addRelation({
             sourceTableId: source.tableId,
             sourceColumnId: source.columnId,
+            sourceSide: source.side,
             targetTableId: target.tableId,
             targetColumnId: target.columnId,
+            targetSide: target.side,
             type,
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE'
@@ -243,11 +246,40 @@ export const CanvasStage: React.FC = () => {
         startSide: 'left' | 'right',
         endSide: 'left' | 'right'
     ) => {
+        const minOffset = 40;
         const dx = Math.abs(endX - startX);
-        const curveOffset = Math.min(dx * 0.5, 80);
+        const dy = Math.abs(endY - startY);
 
-        const cp1x = startSide === 'right' ? startX + curveOffset : startX - curveOffset;
-        const cp2x = endSide === 'left' ? endX - curveOffset : endX + curveOffset;
+        // Calculate curve offset based on distance
+        let curveOffset = Math.max(minOffset, Math.min(dx * 0.4, 100));
+
+        // Determine control point X positions based on sides
+        let cp1x: number;
+        let cp2x: number;
+
+        if (startSide === 'right') {
+            cp1x = startX + curveOffset;
+        } else {
+            cp1x = startX - curveOffset;
+        }
+
+        if (endSide === 'right') {
+            cp2x = endX + curveOffset;
+        } else {
+            cp2x = endX - curveOffset;
+        }
+
+        // For same-side connections, add extra offset for a nicer curve
+        if (startSide === endSide) {
+            const extraOffset = Math.max(60, dy * 0.3);
+            if (startSide === 'right') {
+                cp1x = startX + extraOffset;
+                cp2x = endX + extraOffset;
+            } else {
+                cp1x = startX - extraOffset;
+                cp2x = endX - extraOffset;
+            }
+        }
 
         return [
             startX, startY,
@@ -289,7 +321,7 @@ export const CanvasStage: React.FC = () => {
 
     return (
         <div
-            className="w-full h-full bg-slate-50 overflow-hidden"
+            className="w-full h-full bg-canvas-bg overflow-hidden"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
         >
@@ -319,8 +351,12 @@ export const CanvasStage: React.FC = () => {
                         const targetTable = tables.find(t => t.id === rel.targetTableId);
                         if (!sourceTable || !targetTable) return null;
 
-                        const sourcePos = getColumnPortPosition(sourceTable, rel.sourceColumnId, 'right');
-                        const targetPos = getColumnPortPosition(targetTable, rel.targetColumnId, 'left');
+                        // Use stored sides, fallback to automatic calculation
+                        const storedSourceSide = rel.sourceSide || 'right';
+                        const storedTargetSide = rel.targetSide || 'left';
+
+                        const sourcePos = getColumnPortPosition(sourceTable, rel.sourceColumnId, storedSourceSide);
+                        const targetPos = getColumnPortPosition(targetTable, rel.targetColumnId, storedTargetSide);
 
                         if (!sourcePos || !targetPos) {
                             const sourceHeight = HEADER_HEIGHT + (sourceTable.columns.length * ROW_HEIGHT) + 8;
@@ -345,13 +381,10 @@ export const CanvasStage: React.FC = () => {
                             );
                         }
 
-                        const sourceSide: 'left' | 'right' = sourcePos.x < targetPos.x ? 'right' : 'left';
-                        const targetSide: 'left' | 'right' = sourcePos.x < targetPos.x ? 'left' : 'right';
-
                         const pathPoints = getRelationPath(
                             sourcePos.x, sourcePos.y,
                             targetPos.x, targetPos.y,
-                            sourceSide, targetSide
+                            storedSourceSide, storedTargetSide
                         );
 
                         const isSelected = selectedId === rel.id;
@@ -384,9 +417,9 @@ export const CanvasStage: React.FC = () => {
 
                                 <Arrow
                                     points={[
-                                        targetPos.x + (targetSide === 'left' ? -20 : 20),
+                                        targetPos.x + (storedTargetSide === 'left' ? -25 : 25),
                                         targetPos.y,
-                                        targetPos.x,
+                                        targetPos.x + (storedTargetSide === 'left' ? 2 : -2),
                                         targetPos.y
                                     ]}
                                     stroke={color}
@@ -472,64 +505,72 @@ export const CanvasStage: React.FC = () => {
             </Stage>
 
             {showRelationModal && (
-                <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-2xl p-6 w-80">
-                        <h3 className="text-lg font-bold text-slate-800 mb-4">
+                <div className="fixed inset-0 bg-black/30 dark:bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl p-6 w-80 border border-slate-200 dark:border-zinc-700">
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4">
                             Tipo de Relación
                         </h3>
-                        <p className="text-sm text-slate-600 mb-4">
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
                             Selecciona el tipo de relación entre las tablas:
                         </p>
 
                         <div className="space-y-2">
                             <button
                                 onClick={() => createRelation('1:1')}
-                                className="w-full p-3 text-left rounded-lg border-2 border-slate-200 hover:border-purple-500 hover:bg-purple-50 transition-colors"
+                                className="w-full p-3 text-left rounded-lg border-2 border-slate-200 dark:border-zinc-700 hover:border-purple-500 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
                             >
                                 <div className="flex items-center gap-3">
-                                    <span className="text-2xl">🔗</span>
+                                    <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                                        <LinkIcon size={24} />
+                                    </div>
                                     <div>
-                                        <div className="font-semibold text-purple-600">1:1 (Uno a Uno)</div>
-                                        <div className="text-xs text-slate-500">Ej: Usuario → Perfil</div>
+                                        <div className="font-semibold text-purple-600 dark:text-purple-400">1:1 (Uno a Uno)</div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400">Ej: Usuario → Perfil</div>
                                     </div>
                                 </div>
                             </button>
 
                             <button
                                 onClick={() => createRelation('1:N')}
-                                className="w-full p-3 text-left rounded-lg border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                                className="w-full p-3 text-left rounded-lg border-2 border-slate-200 dark:border-zinc-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                             >
                                 <div className="flex items-center gap-3">
-                                    <span className="text-2xl">📚</span>
+                                    <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                                        <Book size={24} />
+                                    </div>
                                     <div>
-                                        <div className="font-semibold text-blue-600">1:N (Uno a Muchos)</div>
-                                        <div className="text-xs text-slate-500">Ej: Autor → Libros</div>
+                                        <div className="font-semibold text-blue-600 dark:text-blue-400">1:N (Uno a Muchos)</div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400">Ej: Autor → Libros</div>
                                     </div>
                                 </div>
                             </button>
 
                             <button
                                 onClick={() => createRelation('N:1')}
-                                className="w-full p-3 text-left rounded-lg border-2 border-slate-200 hover:border-green-500 hover:bg-green-50 transition-colors"
+                                className="w-full p-3 text-left rounded-lg border-2 border-slate-200 dark:border-zinc-700 hover:border-green-500 dark:hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
                             >
                                 <div className="flex items-center gap-3">
-                                    <span className="text-2xl">📖</span>
+                                    <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+                                        <BookOpen size={24} />
+                                    </div>
                                     <div>
-                                        <div className="font-semibold text-green-600">N:1 (Muchos a Uno)</div>
-                                        <div className="text-xs text-slate-500">Ej: Pedidos → Cliente</div>
+                                        <div className="font-semibold text-green-600 dark:text-green-400">N:1 (Muchos a Uno)</div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400">Ej: Pedidos → Cliente</div>
                                     </div>
                                 </div>
                             </button>
 
                             <button
                                 onClick={() => createRelation('N:M')}
-                                className="w-full p-3 text-left rounded-lg border-2 border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition-colors"
+                                className="w-full p-3 text-left rounded-lg border-2 border-slate-200 dark:border-zinc-700 hover:border-orange-500 dark:hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors"
                             >
                                 <div className="flex items-center gap-3">
-                                    <span className="text-2xl">🔄</span>
+                                    <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+                                        <Repeat size={24} />
+                                    </div>
                                     <div>
-                                        <div className="font-semibold text-orange-600">N:M (Muchos a Muchos)</div>
-                                        <div className="text-xs text-slate-500">Ej: Estudiantes ↔ Cursos</div>
+                                        <div className="font-semibold text-orange-600 dark:text-orange-400">N:M (Muchos a Muchos)</div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400">Ej: Estudiantes ↔ Cursos</div>
                                     </div>
                                 </div>
                             </button>
@@ -540,7 +581,7 @@ export const CanvasStage: React.FC = () => {
                                 setShowRelationModal(false);
                                 setPendingRelation(null);
                             }}
-                            className="w-full mt-4 py-2 text-slate-500 hover:text-slate-700 text-sm"
+                            className="w-full mt-4 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm"
                         >
                             Cancelar
                         </button>

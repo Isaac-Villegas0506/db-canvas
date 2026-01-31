@@ -60,8 +60,10 @@ export interface Relation {
     name?: string;
     sourceTableId: string;
     sourceColumnId: string;
+    sourceSide: 'left' | 'right';
     targetTableId: string;
     targetColumnId: string;
+    targetSide: 'left' | 'right';
     type: RelationType;
     onDelete: ReferentialAction;
     onUpdate: ReferentialAction;

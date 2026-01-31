@@ -33,6 +33,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "clsx": "^2.1.0",
     "konva": "^9.3.2",
     "lucide-react": "^0.344.0",

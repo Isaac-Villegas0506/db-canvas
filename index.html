@@ -6,46 +6,46 @@
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- SEO Meta Tags -->
-  <title>DBCanvas Studio | Visual Database Schema Designer</title>
+
+  <title>DBCanvas Studio | Diseñador Visual de Esquemas de Base de Datos</title>
   <meta name="description"
     content="Diseña esquemas de bases de datos de forma visual e intuitiva. Arrastra, conecta y genera SQL automáticamente. Hecho por Isaac Villegas Dev." />
   <meta name="keywords"
-    content="database, schema, designer, canvas, visual, sql, mysql, postgresql, react, typescript" />
+    content="base de datos, esquema, diseñador, canvas, visual, sql, mysql, postgresql, react, typescript" />
   <meta name="author" content="Isaac Villegas Dev" />
 
-  <!-- Open Graph / Social Media -->
+
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="DBCanvas Studio | Visual Database Schema Designer" />
+  <meta property="og:title" content="DBCanvas Studio | Diseñador Visual de Esquemas de Base de Datos" />
   <meta property="og:description"
     content="Diseña esquemas de bases de datos de forma visual e intuitiva. Arrastra, conecta y genera SQL automáticamente." />
   <meta property="og:image" content="/preview.png" />
   <meta property="og:url" content="https://dbcanvas.isaacvillegasdev.com" />
 
-  <!-- Twitter Card -->
+
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="DBCanvas Studio" />
-  <meta name="twitter:description" content="Visual Database Schema Designer by Isaac Villegas Dev" />
+  <meta name="twitter:description" content="Diseñador Visual de Esquemas de Base de Datos por Isaac Villegas Dev" />
 
-  <!-- Theme -->
+
   <meta name="theme-color" content="#3b82f6" />
 
-  <!--
-    ╔═══════════════════════════════════════════════════════════════╗
-    ║                                                               ║
-    ║   🎨 DBCanvas Studio                                          ║
-    ║   Visual Database Schema Designer                             ║
-    ║                                                               ║
-    ║   Desarrollado por: Isaac Villegas Dev                        ║
-    ║   GitHub: https://github.com/Isaac-Villegas0506                 ║
-    ║   Año: 2024                                                  ║
-    ║                                                               ║
-    ╚═══════════════════════════════════════════════════════════════╝
-    -->
+
 </head>
 
-<body>
+<body class="bg-[#09090b]">
   <div id="root"></div>
+  <script>
+
+    (function () {
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 

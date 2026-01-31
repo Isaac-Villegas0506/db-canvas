@@ -1,6 +1,7 @@
 import React from 'react';
 import { Group, Line } from 'react-konva';
 import { ViewState } from '../types';
+import { useThemeStore } from '../store/themeStore';
 
 interface CanvasGridProps {
     width: number;
@@ -11,6 +12,9 @@ interface CanvasGridProps {
 export const CanvasGrid: React.FC<CanvasGridProps> = ({ width, height, viewState }) => {
     const gridSize = 50;
     const { scale, position } = viewState;
+    const theme = useThemeStore((state) => state.theme);
+
+    const gridColor = theme === 'dark' ? '#27272a' : '#e2e8f0';
 
     const startX = Math.floor((-position.x / scale) / gridSize) * gridSize;
     const startY = Math.floor((-position.y / scale) / gridSize) * gridSize;
@@ -25,7 +29,7 @@ export const CanvasGrid: React.FC<CanvasGridProps> = ({ width, height, viewState
             <Line
                 key={`v-${x}`}
                 points={[x, startY, x, endY]}
-                stroke="#e2e8f0"
+                stroke={gridColor}
                 strokeWidth={1 / scale}
             />
         );
@@ -36,7 +40,7 @@ export const CanvasGrid: React.FC<CanvasGridProps> = ({ width, height, viewState
             <Line
                 key={`h-${y}`}
                 points={[startX, y, endX, y]}
-                stroke="#e2e8f0"
+                stroke={gridColor}
                 strokeWidth={1 / scale}
             />
         );

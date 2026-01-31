@@ -93,10 +93,11 @@ export const NoteNode: React.FC<NoteNodeProps> = ({ note, isSelected, onSelect, 
                     cornerRadius={4}
                 />
                 <Text
-                    text="✎"
-                    x={5}
-                    y={3}
-                    fontSize={12}
+                    text="..."
+                    x={4}
+                    y={1}
+                    fontSize={14}
+                    fontStyle="bold"
                     fill="white"
                     listening={false}
                 />
