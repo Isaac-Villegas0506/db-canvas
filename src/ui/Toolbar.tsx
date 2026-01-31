@@ -131,8 +131,26 @@ export const Toolbar: React.FC = () => {
                         ${isPropertiesOpen ? 'left-[calc(50%-10rem)]' : 'left-1/2'}
                     `}
                 >
-                    <div className={`bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-slate-200 dark:border-zinc-700/50 w-[95vw] sm:w-auto transition-all duration-300 overflow-hidden ${isExpanded ? 'h-auto pb-2' : 'h-14 sm:h-12'}`}>
+                    <div className={`bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-slate-200 dark:border-zinc-700/50 w-[calc(100vw-9rem)] sm:w-auto transition-all duration-300 overflow-hidden ${isExpanded ? 'h-auto pb-2' : 'h-14 sm:h-12'}`}>
                         <div className={`flex items-center gap-4 px-4 ${isExpanded ? 'flex-wrap pt-2 justify-center' : 'h-full overflow-hidden'}`}>
+
+                            {/* Toggle Buttons (Left side) */}
+                            <div className="flex items-center gap-1 border-r border-slate-200 dark:border-zinc-700/50 pr-2 flex-shrink-0">
+                                <button
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                    className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded transition-colors"
+                                    title={isExpanded ? "Colapsar" : "Expandir"}
+                                >
+                                    {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                </button>
+                                <button
+                                    onClick={toggleToolbar}
+                                    className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded transition-colors"
+                                    title="Ocultar barra de herramientas"
+                                >
+                                    <ChevronUp size={16} />
+                                </button>
+                            </div>
 
                             {/* Undo/Redo Group */}
                             <div className="flex items-center gap-1 border-r border-slate-200 dark:border-zinc-700/50 pr-4 flex-shrink-0">
@@ -229,23 +247,6 @@ export const Toolbar: React.FC = () => {
                                     <span className="hidden lg:inline">Editor</span>
                                 </button>
 
-                                {/* Internal Toggle Buttons */}
-                                <div className="flex items-center gap-1 border-l border-slate-200 dark:border-zinc-700/50 pl-2 ml-2">
-                                    <button
-                                        onClick={() => setIsExpanded(!isExpanded)}
-                                        className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded transition-colors"
-                                        title={isExpanded ? "Colapsar" : "Expandir"}
-                                    >
-                                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                    </button>
-                                    <button
-                                        onClick={toggleToolbar}
-                                        className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded transition-colors"
-                                        title="Ocultar barra de herramientas"
-                                    >
-                                        <ChevronUp size={16} />
-                                    </button>
-                                </div>
                             </div>
                         </div>
 
